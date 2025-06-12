@@ -18,53 +18,54 @@ Sistema integrado de gestão para freelancers de tecnologia, focado em produtivi
 ## 🏗️ **ARQUITETURA DO SISTEMA**
 ```mermaid
 graph TB
-subgraph “Frontend Layer”
-A[Next.js 14 App]
-B[React Components]
-C[TypeScript]
-D[Tailwind CSS]
-end
+    subgraph "Frontend Layer"
+        A[Next.js 14 App]
+        B[React Components]
+        C[TypeScript]
+        D[Tailwind CSS]
+    end
 
-subgraph "Backend Services"
-    E[Supabase Database]
-    F[Edge Functions]
-    G[Real-time Subscriptions]
-    H[Authentication]
-end
+    subgraph "Backend Services"
+        E[Supabase Database]
+        F[Edge Functions]
+        G[Real-time Subscriptions]
+        H[Authentication]
+    end
 
-subgraph "External Integrations"
-    I[Gemini AI API]
-    J[Social Media APIs]
-    K[Free Media Libraries]
-    L[Email Services]
-end
+    subgraph "External Integrations"
+        I[Gemini AI API]
+        J[Social Media APIs]
+        K[Free Media Libraries]
+        L[Email Services]
+    end
 
-subgraph "Core Modules"
-    M[Content Management]
-    N[CRM System]
-    O[Analytics Engine]
-    P[Automation Workflows]
-    Q[Reminder System]
-end
+    subgraph "Core Modules"
+        M[Content Management]
+        N[CRM System]
+        O[Analytics Engine]
+        P[Automation Workflows]
+        Q[Reminder System]
+    end
 
-A --> E
-A --> F
-A --> G
-A --> H
+    %% Conexões
+    A --> E
+    A --> F
+    A --> G
+    A --> H
 
-F --> I
-F --> J
-F --> K
-F --> L
+    F --> I
+    F --> J
+    F --> K
+    F --> L
 
-E --> M
-E --> N
-E --> O
-E --> P
-E --> Q
+    E --> M
+    E --> N
+    E --> O
+    E --> P
+    E --> Q
 
-M --> I
-N --> I
+    M --> I
+    N --> I
 ```
 
 ### **Stack Tecnológica**
