@@ -274,30 +274,30 @@ LEADS ||--o{ METRICS : generates
 ### **Componentes Principais**
 ```mermaid
 flowchart TD
-A[Dashboard Principal] –> B[Widgets de Métricas]
-A –> C[Calendário de Conteúdo]
-A –> D[Leads Recentes]
-A –> E[Lembretes Pendentes]
+    A[Dashboard Principal] --> B[Widgets de Métricas]
+    A --> C[Calendário de Conteúdo]
+    A --> D[Leads Recentes]
+    A --> E[Lembretes Pendentes]
 
-F[Gestão de Conteúdo] --> G[Editor Rich Text]
-F --> H[Seletor de Plataformas]
-F --> I[Agendamento]
-F --> J[Sugestões IA]
+    F[Gestão de Conteúdo] --> G[Editor Rich Text]
+    F --> H[Seletor de Plataformas]
+    F --> I[Agendamento]
+    F --> J[Sugestões IA]
 
-K[CRM Interface] --> L[Lista de Leads]
-K --> M[Kanban Pipeline]
-K --> N[Formulário de Contato]
-K --> O[Timeline de Interações]
+    K[CRM Interface] --> L[Lista de Leads]
+    K --> M[Kanban Pipeline]
+    K --> N[Formulário de Contato]
+    K --> O[Timeline de Interações]
 
-P[Analytics Dashboard] --> Q[Gráficos Interativos]
-P --> R[Filtros de Período]
-P --> S[Comparações]
-P --> T[Exportação de Dados]
+    P[Analytics Dashboard] --> Q[Gráficos Interativos]
+    P --> R[Filtros de Período]
+    P --> S[Comparações]
+    P --> T[Exportação de Dados]
 
-U[Automação Center] --> V[Visual Workflow Builder]
-U --> W[Triggers e Ações]
-U --> X[Logs de Execução]
-U --> Y[Templates Pré-definidos]
+    U[Automação Center] --> V[Visual Workflow Builder]
+    U --> W[Triggers e Ações]
+    U --> X[Logs de Execução]
+    U --> Y[Templates Pré-definidos]
 ```
 -----
 
@@ -542,66 +542,66 @@ Dashboard → Módulo → Subseção → Ação
 
 ```mermaid
 graph TD
-A[Ideia/Tema] –> B{Usar IA?}
-B –>|Sim| C[Gemini Gera Conteúdo]
-B –>|Não| D[Escrever Manualmente]
+    A[Ideia/Tema] --> B{Usar IA?}
+    B -->|Sim| C[Gemini Gera Conteúdo]
+    B -->|Não| D[Escrever Manualmente]
 
+    C --> E[Revisar Conteúdo]
+    D --> E
 
-C --> E[Revisar Conteúdo]
-D --> E
+    E --> F[Selecionar Mídia]
+    F --> G[Adicionar Hashtags]
+    G --> H[Escolher Plataformas]
+    H --> I{Publicar Agora?}
 
-E --> F[Selecionar Mídia]
-F --> G[Adicionar Hashtags]
-G --> H[Escolher Plataformas]
-H --> I{Publicar Agora?}
+    I -->|Sim| J[Publicar Imediatamente]
+    I -->|Não| K[Agendar Publicação]
 
-I -->|Sim| J[Publicar Imediatamente]
-I -->|Não| K[Agendar Publicação]
+    J --> L[Monitorar Métricas]
+    K --> M[Aguardar Horário]
+    M --> J
 
-J --> L[Monitorar Métricas]
-K --> M[Aguardar Horário]
-M --> J
+    L --> N[Analisar Performance]
+    N --> O[Insights e Otimizações]
+    O --> P[Ajustar Estratégia]
 
-L --> N[Analisar Performance]
-N --> O[Insights e Otimizações]
-O --> P[Ajustar Estratégia]
 ```
 ### **Fluxo de Gestão de Leads**
 ```mermaid
 graph TD
-A[Novo Lead] –> B[Importar/Adicionar Dados]
-B –> C[IA Calcula Score]
-C –> D{Score Alto?}
+    A[Novo Lead] --> B[Importar/Adicionar Dados]
+    B --> C[IA Calcula Score]
+    C --> D{Score Alto?}
 
-D -->|Sim| E[Prioridade Alta]
-D -->|Não| F[Nurturing Automático]
+    D -->|Sim| E[Prioridade Alta]
+    D -->|Não| F[Nurturing Automático]
 
-E --> G[Contato Imediato]
-F --> H[Sequência de Emails]
+    E --> G[Contato Imediato]
+    F --> H[Sequência de Emails]
 
-G --> I[Registrar Interação]
-H --> I
+    G --> I[Registrar Interação]
+    H --> I
 
-I --> J[Análise de Sentimento]
-J --> K{Interesse Positivo?}
+    I --> J[Análise de Sentimento]
+    J --> K{Interesse Positivo?}
 
-K -->|Sim| L[Mover para Qualificado]
-K -->|Não| M[Manter em Nurturing]
+    K -->|Sim| L[Mover para Qualificado]
+    K -->|Não| M[Manter em Nurturing]
 
-L --> N[Agendar Demo/Reunião]
-M --> O[Lembrete Follow-up]
+    L --> N[Agendar Demo/Reunião]
+    M --> O[Lembrete Follow-up]
 
-N --> P[Enviar Proposta]
-O --> Q[Aguardar Tempo]
-Q --> G
+    N --> P[Enviar Proposta]
+    O --> Q[Aguardar Tempo]
+    Q --> G
 
-P --> R{Proposta Aceita?}
-R -->|Sim| S[Cliente Fechado]
-R -->|Não| T[Negociação]
-T --> P
+    P --> R{Proposta Aceita?}
+    R -->|Sim| S[Cliente Fechado]
+    R -->|Não| T[Negociação]
+    T --> P
 
-S --> U[Onboarding]
-U --> V[Upsell/Cross-sell]
+    S --> U[Onboarding]
+    U --> V[Upsell/Cross-sell]
 ```
 -----
 
