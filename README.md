@@ -16,7 +16,8 @@ Sistema integrado de gestão para freelancers de tecnologia, focado em produtivi
 -----
 
 ## 🏗️ **ARQUITETURA DO SISTEMA**
-```graph TB
+```mermaid
+graph TB
 subgraph “Frontend Layer”
 A[Next.js 14 App]
 B[React Components]
@@ -99,7 +100,8 @@ Deployment:
 -----
 
 ## 📊 **MODELO DE DADOS**
-```erDiagram
+```mermaid
+erDiagram
 PROFILES {
 uuid id PK
 text email
@@ -269,7 +271,8 @@ LEADS ||--o{ METRICS : generates
 ```
 
 ### **Componentes Principais**
-```flowchart TD
+```mermaid
+flowchart TD
 A[Dashboard Principal] –> B[Widgets de Métricas]
 A –> C[Calendário de Conteúdo]
 A –> D[Leads Recentes]
@@ -536,7 +539,8 @@ Dashboard → Módulo → Subseção → Ação
 
 ### **Fluxo de Criação de Conteúdo**
 
-```graph TD
+```mermaid
+graph TD
 A[Ideia/Tema] –> B{Usar IA?}
 B –>|Sim| C[Gemini Gera Conteúdo]
 B –>|Não| D[Escrever Manualmente]
@@ -562,7 +566,8 @@ N --> O[Insights e Otimizações]
 O --> P[Ajustar Estratégia]
 ```
 ### **Fluxo de Gestão de Leads**
-```graph TD
+```mermaid
+graph TD
 A[Novo Lead] –> B[Importar/Adicionar Dados]
 B –> C[IA Calcula Score]
 C –> D{Score Alto?}
