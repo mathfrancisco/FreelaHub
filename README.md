@@ -1,8 +1,4 @@
-# FreelaHub
-# Sistema de Gerenciamento para Freelancer Tech
-
-## Escopo Reformulado Completo
-
+# FreelaHub - Sistema de Gerenciamento para Freelancer Tech
 -----
 
 ## 🎯 **VISÃO GERAL DO SISTEMA**
