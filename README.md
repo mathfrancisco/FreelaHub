@@ -16,7 +16,7 @@ Sistema integrado de gestão para freelancers de tecnologia, focado em produtivi
 -----
 
 ## 🏗️ **ARQUITETURA DO SISTEMA**
-
+```
 graph TB
 subgraph “Frontend Layer”
 A[Next.js 14 App]
@@ -25,7 +25,6 @@ C[TypeScript]
 D[Tailwind CSS]
 end
 
-```
 subgraph "Backend Services"
     E[Supabase Database]
     F[Edge Functions]
