@@ -17,6 +17,57 @@ Sistema integrado de gestão para freelancers de tecnologia, focado em produtivi
 
 ## 🏗️ **ARQUITETURA DO SISTEMA**
 
+graph TB
+subgraph “Frontend Layer”
+A[Next.js 14 App]
+B[React Components]
+C[TypeScript]
+D[Tailwind CSS]
+end
+
+```
+subgraph "Backend Services"
+    E[Supabase Database]
+    F[Edge Functions]
+    G[Real-time Subscriptions]
+    H[Authentication]
+end
+
+subgraph "External Integrations"
+    I[Gemini AI API]
+    J[Social Media APIs]
+    K[Free Media Libraries]
+    L[Email Services]
+end
+
+subgraph "Core Modules"
+    M[Content Management]
+    N[CRM System]
+    O[Analytics Engine]
+    P[Automation Workflows]
+    Q[Reminder System]
+end
+
+A --> E
+A --> F
+A --> G
+A --> H
+
+F --> I
+F --> J
+F --> K
+F --> L
+
+E --> M
+E --> N
+E --> O
+E --> P
+E --> Q
+
+M --> I
+N --> I
+```
+
 ### **Stack Tecnológica**
 
 ```yaml
@@ -50,7 +101,137 @@ Deployment:
 -----
 
 ## 📊 **MODELO DE DADOS**
+erDiagram
+PROFILES {
+uuid id PK
+text email
+text full_name
+text avatar_url
+text subscription_tier
+jsonb business_info
+jsonb settings
+timestamp created_at
+timestamp updated_at
+}
 
+```
+CONTENTS {
+    uuid id PK
+    uuid user_id FK
+    text title
+    text body
+    text content_type
+    text_array platforms
+    text status
+    timestamp scheduled_for
+    timestamp published_at
+    text_array hashtags
+    text_array media_urls
+    jsonb metrics
+    jsonb ai_suggestions
+    timestamp created_at
+    timestamp updated_at
+}
+
+LEADS {
+    uuid id PK
+    uuid user_id FK
+    text name
+    text email
+    text company
+    text position
+    text phone
+    text linkedin_url
+    text source
+    text status
+    integer score
+    decimal estimated_value
+    text_array tags
+    text notes
+    timestamp last_contact
+    text next_action
+    timestamp next_action_date
+    timestamp created_at
+    timestamp updated_at
+}
+
+INTERACTIONS {
+    uuid id PK
+    uuid lead_id FK
+    uuid user_id FK
+    text type
+    text subject
+    text content
+    text outcome
+    text sentiment
+    text_array attachments
+    timestamp created_at
+}
+
+REMINDERS {
+    uuid id PK
+    uuid user_id FK
+    text title
+    text description
+    text type
+    text priority
+    text status
+    timestamp due_date
+    jsonb metadata
+    timestamp created_at
+    timestamp updated_at
+}
+
+METRICS {
+    uuid id PK
+    uuid user_id FK
+    text metric_name
+    text metric_type
+    decimal value
+    text platform
+    uuid content_id FK
+    uuid lead_id FK
+    jsonb metadata
+    timestamp recorded_at
+}
+
+WORKFLOWS {
+    uuid id PK
+    uuid user_id FK
+    text name
+    text description
+    text trigger_type
+    jsonb trigger_config
+    jsonb actions
+    text status
+    integer execution_count
+    timestamp last_executed
+    timestamp created_at
+    timestamp updated_at
+}
+
+AI_INSIGHTS {
+    uuid id PK
+    uuid user_id FK
+    text insight_type
+    text title
+    text description
+    jsonb data
+    decimal confidence_score
+    boolean acknowledged
+    timestamp created_at
+}
+
+PROFILES ||--o{ CONTENTS : creates
+PROFILES ||--o{ LEADS : manages
+PROFILES ||--o{ REMINDERS : has
+PROFILES ||--o{ METRICS : tracks
+PROFILES ||--o{ WORKFLOWS : owns
+PROFILES ||--o{ AI_INSIGHTS : receives
+LEADS ||--o{ INTERACTIONS : has
+CONTENTS ||--o{ METRICS : generates
+LEADS ||--o{ METRICS : generates
+```
 -----
 
 ## 🎨 **DESIGN E INTERFACE**
@@ -92,7 +273,33 @@ Deployment:
 ```
 
 ### **Componentes Principais**
+flowchart TD
+A[Dashboard Principal] –> B[Widgets de Métricas]
+A –> C[Calendário de Conteúdo]
+A –> D[Leads Recentes]
+A –> E[Lembretes Pendentes]
 
+```
+F[Gestão de Conteúdo] --> G[Editor Rich Text]
+F --> H[Seletor de Plataformas]
+F --> I[Agendamento]
+F --> J[Sugestões IA]
+
+K[CRM Interface] --> L[Lista de Leads]
+K --> M[Kanban Pipeline]
+K --> N[Formulário de Contato]
+K --> O[Timeline de Interações]
+
+P[Analytics Dashboard] --> Q[Gráficos Interativos]
+P --> R[Filtros de Período]
+P --> S[Comparações]
+P --> T[Exportação de Dados]
+
+U[Automação Center] --> V[Visual Workflow Builder]
+U --> W[Triggers e Ações]
+U --> X[Logs de Execução]
+U --> Y[Templates Pré-definidos]
+```
 -----
 
 ## 🚀 **MÓDULOS FUNCIONAIS**
@@ -333,9 +540,68 @@ Dashboard → Módulo → Subseção → Ação
 ## 🔄 **FLUXOS DE TRABALHO**
 
 ### **Fluxo de Criação de Conteúdo**
+graph TD
+A[Ideia/Tema] –> B{Usar IA?}
+B –>|Sim| C[Gemini Gera Conteúdo]
+B –>|Não| D[Escrever Manualmente]
 
+```
+C --> E[Revisar Conteúdo]
+D --> E
+
+E --> F[Selecionar Mídia]
+F --> G[Adicionar Hashtags]
+G --> H[Escolher Plataformas]
+H --> I{Publicar Agora?}
+
+I -->|Sim| J[Publicar Imediatamente]
+I -->|Não| K[Agendar Publicação]
+
+J --> L[Monitorar Métricas]
+K --> M[Aguardar Horário]
+M --> J
+
+L --> N[Analisar Performance]
+N --> O[Insights e Otimizações]
+O --> P[Ajustar Estratégia]
+```
 ### **Fluxo de Gestão de Leads**
+graph TD
+A[Novo Lead] –> B[Importar/Adicionar Dados]
+B –> C[IA Calcula Score]
+C –> D{Score Alto?}
 
+```
+D -->|Sim| E[Prioridade Alta]
+D -->|Não| F[Nurturing Automático]
+
+E --> G[Contato Imediato]
+F --> H[Sequência de Emails]
+
+G --> I[Registrar Interação]
+H --> I
+
+I --> J[Análise de Sentimento]
+J --> K{Interesse Positivo?}
+
+K -->|Sim| L[Mover para Qualificado]
+K -->|Não| M[Manter em Nurturing]
+
+L --> N[Agendar Demo/Reunião]
+M --> O[Lembrete Follow-up]
+
+N --> P[Enviar Proposta]
+O --> Q[Aguardar Tempo]
+Q --> G
+
+P --> R{Proposta Aceita?}
+R -->|Sim| S[Cliente Fechado]
+R -->|Não| T[Negociação]
+T --> P
+
+S --> U[Onboarding]
+U --> V[Upsell/Cross-sell]
+```
 -----
 
 ## 🔧 **FUNCIONALIDADES TÉCNICAS**
