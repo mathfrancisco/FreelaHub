@@ -16,8 +16,7 @@ Sistema integrado de gestão para freelancers de tecnologia, focado em produtivi
 -----
 
 ## 🏗️ **ARQUITETURA DO SISTEMA**
-```
-graph TB
+```graph TB
 subgraph “Frontend Layer”
 A[Next.js 14 App]
 B[React Components]
@@ -100,7 +99,7 @@ Deployment:
 -----
 
 ## 📊 **MODELO DE DADOS**
-erDiagram
+```erDiagram
 PROFILES {
 uuid id PK
 text email
@@ -112,8 +111,6 @@ jsonb settings
 timestamp created_at
 timestamp updated_at
 }
-
-```
 CONTENTS {
     uuid id PK
     uuid user_id FK
@@ -272,13 +269,12 @@ LEADS ||--o{ METRICS : generates
 ```
 
 ### **Componentes Principais**
-flowchart TD
+```flowchart TD
 A[Dashboard Principal] –> B[Widgets de Métricas]
 A –> C[Calendário de Conteúdo]
 A –> D[Leads Recentes]
 A –> E[Lembretes Pendentes]
 
-```
 F[Gestão de Conteúdo] --> G[Editor Rich Text]
 F --> H[Seletor de Plataformas]
 F --> I[Agendamento]
@@ -539,12 +535,13 @@ Dashboard → Módulo → Subseção → Ação
 ## 🔄 **FLUXOS DE TRABALHO**
 
 ### **Fluxo de Criação de Conteúdo**
-graph TD
+
+```graph TD
 A[Ideia/Tema] –> B{Usar IA?}
 B –>|Sim| C[Gemini Gera Conteúdo]
 B –>|Não| D[Escrever Manualmente]
 
-```
+
 C --> E[Revisar Conteúdo]
 D --> E
 
@@ -565,12 +562,11 @@ N --> O[Insights e Otimizações]
 O --> P[Ajustar Estratégia]
 ```
 ### **Fluxo de Gestão de Leads**
-graph TD
+```graph TD
 A[Novo Lead] –> B[Importar/Adicionar Dados]
 B –> C[IA Calcula Score]
 C –> D{Score Alto?}
 
-```
 D -->|Sim| E[Prioridade Alta]
 D -->|Não| F[Nurturing Automático]
 
