@@ -59,10 +59,10 @@ export const useAuthStore = create<AuthState>()(
                     throw error
                 }
             },
-
             signUp: async (email: string, password: string, fullName: string) => {
                 set({ isLoading: true })
                 try {
+                    // Primeiro, criar o usuário no Supabase Auth
                     const { data, error } = await supabase.auth.signUp({
                         email,
                         password,
@@ -73,9 +73,20 @@ export const useAuthStore = create<AuthState>()(
                         },
                     })
 
-                    if (error) throw error
+                    if (error) {
+                        console.error('Erro no signUp:', error)
+                        throw new Error(`Erro ao criar conta: ${error.message}`)
+                    }
+
+                    // Se o usuário foi criado mas precisa confirmar email
+                    if (data.user && !data.user.email_confirmed_at) {
+                        console.log('Usuário criado, aguardando confirmação de email')
+                    }
+
                     set({ isLoading: false })
-                } catch (error) {
+                    return data
+                } catch (error: any) {
+                    console.error('Erro completo no signUp:', error)
                     set({ isLoading: false })
                     throw error
                 }

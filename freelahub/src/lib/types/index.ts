@@ -1,3 +1,5 @@
+import { Session } from '@supabase/supabase-js'
+
 export interface User {
     id: string
     email: string
@@ -203,7 +205,13 @@ export interface AuthState {
     isLoading: boolean
     isAuthenticated: boolean
     signIn: (email: string, password: string) => Promise<void>
-    signUp: (email: string, password: string, fullName: string) => Promise<void>
+    signUp: (email: string, password: string, fullName: string) => Promise<{
+        user: User | null;
+        session: Session | null;
+    } | {
+        user: null;
+        session: null;
+    }>
     signOut: () => Promise<void>
     updateUser: (updates: Partial<User>) => Promise<void>
     checkAuth: () => Promise<void>

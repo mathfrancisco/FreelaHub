@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:generate-types": "supabase gen types typescript --project-id YOUR_PROJECT_ID > src/lib/types/database.ts"
+    "db:generate-types": "supabase gen types typescript --project-id oovchlseucfmmflqitki > src/lib/types/database.ts"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

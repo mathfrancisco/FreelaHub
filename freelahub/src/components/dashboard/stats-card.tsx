@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils/utils"
 
@@ -23,26 +24,42 @@ export function StatsCard({
                               className
                           }: StatsCardProps) {
     return (
-        <Card className={cn("relative overflow-hidden", className)}>
+        <Card className={cn(
+            "border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-all duration-300 group",
+            className
+        )}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium text-slate-600">
                     {title}
                 </CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
+                <div className="p-2 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg group-hover:from-purple-200 group-hover:to-blue-200 transition-colors duration-300">
+                    <Icon className="h-4 w-4 text-purple-700" />
+                </div>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{value}</div>
-                {change && (
-                    <p className={cn(
-                        "text-xs flex items-center gap-1 mt-1",
-                        change.type === 'increase' ? "text-green-600" : "text-red-600"
-                    )}>
-                        <span>{change.type === 'increase' ? '↑' : '↓'}</span>
-                        {Math.abs(change.value)}% em relação ao mês anterior
-                    </p>
-                )}
+                <div className="text-2xl font-bold text-slate-900 mb-2">
+                    {value}
+                </div>
+                <div className="flex items-center justify-between">
+                    {change && (
+                        <Badge
+                            variant="outline"
+                            className={cn(
+                                "text-xs font-medium",
+                                change.type === 'increase'
+                                    ? "border-green-200 bg-green-50 text-green-700"
+                                    : "border-red-200 bg-red-50 text-red-700"
+                            )}
+                        >
+                            <span className="mr-1">
+                                {change.type === 'increase' ? '↗' : '↘'}
+                            </span>
+                            {Math.abs(change.value)}%
+                        </Badge>
+                    )}
+                </div>
                 {description && (
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-slate-500 mt-2">
                         {description}
                     </p>
                 )}
