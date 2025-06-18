@@ -384,7 +384,7 @@ export default function ContentEditorPage() {
                                 onAIAnalysis={handleAIAnalysis}
                                 isSaving={isSaving}
                                 isAnalyzing={isAnalyzing}
-                                className="bg-transparent" // Remove background pois já está no ContentEditor
+                                className="bg-transparent"
                             />
                         </div>
 

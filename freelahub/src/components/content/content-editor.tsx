@@ -27,25 +27,7 @@ import {
     BarChart3
 } from "lucide-react"
 import {Textarea} from "@/components/forms/textarea";
-
-// Mock types for demo
-interface Content {
-    id?: string;
-    title?: string;
-    body?: string;
-    content_type?: string;
-    target_platforms?: string[];
-    hashtags?: string[];
-    status?: string;
-    ai_analysis?: AIAnalysis;
-}
-
-interface AIAnalysis {
-    sentiment: 'positive' | 'negative' | 'neutral';
-    readability_score: number;
-    seo_score: number;
-    suggestions?: string[];
-}
+import {AIAnalysis,Content} from "@/lib/types";
 
 interface ContentEditorProps {
     content?: Partial<Content>,
@@ -168,6 +150,12 @@ export default function ContentEditor({
         setIsAnalyzingLocal(true)
         setTimeout(() => {
             setAiAnalysis({
+                content_insights: {call_to_action_strength: 0, complexity: "", emotional_appeal: 0, tone: ""},
+                engagement_score: 0,
+                optimal_posting_times: {},
+                predicted_performance: {facebook: 0, instagram: 0, linkedin: 0, twitter: 0},
+                tone: [],
+                topics: [],
                 sentiment: 'positive',
                 readability_score: 85,
                 seo_score: 78,
