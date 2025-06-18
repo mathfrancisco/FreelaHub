@@ -10,7 +10,6 @@ import { StatsCard } from '@/components/dashboard/stats-card'
 import { OverviewChart } from "@/components/dashboard/overview-chart"
 import { RecentActivity } from "@/components/dashboard/recent-activity"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { ActivityItem } from "@/lib/types"
 import { AuthGuard } from "@/components/auth/auth-guard"
 
@@ -229,37 +228,6 @@ function DashboardContent() {
         <AppLayout>
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
                 <div className="space-y-8 p-6">
-                    {/* Cabeçalho de Boas-Vindas */}
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl opacity-5"></div>
-                        <Card className="relative border-0 shadow-xl bg-gradient-to-br from-white to-slate-50/80 backdrop-blur-sm">
-                            <CardHeader className="pb-6">
-                                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl">
-                                                <Sparkles className="h-6 w-6 text-purple-600" />
-                                            </div>
-                                            <div>
-                                                <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                                                    Olá, {user?.full_name?.split(' ')[0] || 'Usuário'}! 👋
-                                                </h1>
-                                                <p className="text-slate-600 mt-1">
-                                                    Aqui está um resumo rápido do seu negócio hoje
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0">
-                                            Dashboard Atualizado
-                                        </Badge>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                        </Card>
-                    </div>
-
                     {/* Grid de Métricas Principais */}
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                         <StatsCard
