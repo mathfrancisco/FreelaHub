@@ -279,3 +279,16 @@ export type ContentUpdate = {
     engagement_score?: number | null
     updated_at?: string
 }
+
+export interface ActivityItem {
+    /**
+     * Identificador único do item de atividade (ex: "content-uuid" ou "lead-uuid").
+     */
+    id: string;
+    type: 'content' | 'lead' | 'interaction' | 'reminder';
+    title: string;
+    description: string;
+    timestamp: string;
+    avatar?: string;
+    status?: 'success' | 'warning' | 'error';
+}

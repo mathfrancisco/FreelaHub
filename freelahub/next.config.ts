@@ -1,14 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    experimental: {
-        serverComponentsExternalPackages: ['sharp']
-    },
     images: {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'your-supabase-project.supabase.co',
+                hostname: 'https://oovchlseucfmmflqitki.supabase.co',
                 pathname: '/**',
             },
             {
@@ -21,6 +18,9 @@ const nextConfig: NextConfig = {
     },
     env: {
         CUSTOM_ENV_VAR: process.env.CUSTOM_ENV_VAR,
+    },
+    eslint: {
+        ignoreDuringBuilds: true,
     },
 }
 

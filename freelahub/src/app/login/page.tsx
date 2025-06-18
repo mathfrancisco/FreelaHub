@@ -1,0 +1,175 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react'
+import { useAuthStore } from '@/store/auth-store'
+
+export default function LoginPage() {
+    const [isLogin, setIsLogin] = useState(true)
+    const [showPassword, setShowPassword] = useState(false)
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        fullName: ''
+    })
+    const [error, setError] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+
+    const { signIn, signUp } = useAuthStore()
+    const router = useRouter()
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setError('')
+        setIsLoading(true)
+
+        try {
+            if (isLogin) {
+                await signIn(formData.email, formData.password)
+            } else {
+                await signUp(formData.email, formData.password, formData.fullName)
+            }
+            router.push('/dashboard')
+        } catch (error: any) {
+            setError(error.message || 'Ocorreu um erro. Tente novamente.')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData(prev => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }))
+    }
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+            <div className="max-w-md w-full space-y-8">
+                {/* Header */}
+                <div className="text-center">
+                    <div className="mx-auto h-12 w-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+                        <User className="h-6 w-6 text-white" />
+                    </div>
+                    <h2 className="mt-6 text-3xl font-bold text-gray-900">
+                        {isLogin ? 'Entre na sua conta' : 'Crie sua conta'}
+                    </h2>
+                    <p className="mt-2 text-sm text-gray-600">
+                        {isLogin ? 'Acesse seu dashboard' : 'Comece a usar nossa plataforma'}
+                    </p>
+                </div>
+
+                {/* Form */}
+                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+                    <div className="bg-white p-8 rounded-xl shadow-lg space-y-6">
+                        {/* Nome Completo (apenas no registro) */}
+                        {!isLogin && (
+                            <div>
+                                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Nome Completo
+                                </label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                                    <input
+                                        id="fullName"
+                                        name="fullName"
+                                        type="text"
+                                        required={!isLogin}
+                                        value={formData.fullName}
+                                        onChange={handleInputChange}
+                                        className="pl-10 w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        placeholder="Seu nome completo"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Email */}
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                Email
+                            </label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    className="pl-10 w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    placeholder="seu@email.com"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Senha */}
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                                Senha
+                            </label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    required
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    className="pl-10 pr-10 w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    placeholder="Sua senha"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Mensagem de Erro */}
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                                {error}
+                            </div>
+                        )}
+
+                        {/* Botão de Submit */}
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            {isLoading ? (
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                            ) : (
+                                isLogin ? 'Entrar' : 'Criar Conta'
+                            )}
+                        </button>
+                    </div>
+
+                    {/* Toggle entre Login e Registro */}
+                    <div className="text-center">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsLogin(!isLogin)
+                                setError('')
+                                setFormData({ email: '', password: '', fullName: '' })
+                            }}
+                            className="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
+                        >
+                            {isLogin ? 'Não tem uma conta? Registre-se' : 'Já tem uma conta? Faça login'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    )
+}

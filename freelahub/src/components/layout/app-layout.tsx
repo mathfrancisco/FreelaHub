@@ -5,6 +5,7 @@ import { Sidebar } from './sidebar'
 import { Header } from './header'
 import { cn } from '@/lib/utils/utils'
 
+
 interface AppLayoutProps {
     children: ReactNode
     className?: string

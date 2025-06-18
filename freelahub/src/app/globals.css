@@ -1,10 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
-@tailwind utilities;
-
+/* As definições de variáveis abaixo são a base do seu sistema de design.
+  Elas são essenciais para que o Tailwind (após configurado corretamente)
+  possa gerar as classes de cores para seus temas light e dark.
+*/
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -50,30 +50,4 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
   }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-muted;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/30 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground/50;
 }
