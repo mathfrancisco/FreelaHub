@@ -76,6 +76,22 @@ export interface AIAnalysis {
     readability_score: number
     seo_score: number
     suggestions: string[]
+    engagement_score: number;
+    predicted_performance: {
+        instagram: number;
+        linkedin: number;
+        twitter: number;
+        facebook: number;
+    };
+    optimal_posting_times: {
+        [platform: string]: string[];
+    };
+    content_insights: {
+        tone: string;
+        complexity: string;
+        call_to_action_strength: number;
+        emotional_appeal: number;
+    };
 }
 
 export interface Lead {
@@ -300,3 +316,4 @@ export interface ActivityItem {
     avatar?: string;
     status?: 'success' | 'warning' | 'error';
 }
+

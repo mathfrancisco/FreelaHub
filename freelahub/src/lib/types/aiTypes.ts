@@ -49,3 +49,4 @@ export interface AutomationSuggestion {
     complexity: 'simple' | 'medium' | 'complex';
     roi: number;
 }
+

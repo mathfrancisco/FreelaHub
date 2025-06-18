@@ -3,6 +3,13 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
 
 export interface ContentAnalysis {
+    platformPredictions: { instagram: number; linkedin: number; twitter: number; facebook: number };
+    seoScore: number;
+    topics: any[];
+    emotionalAppeal: number;
+    ctaStrength: number;
+    complexity: string;
+    optimalTimes: { instagram: string[]; linkedin: string[]; twitter: string[]; facebook: string[] };
     sentiment: 'positive' | 'negative' | 'neutral';
     tone: string;
     readabilityScore: number;
@@ -29,6 +36,9 @@ export interface ContentSuggestion {
     hashtags: string[];
     bestTimeToPost: string;
     expectedEngagement: number;
+    reasoning: string;
+    content: string;
+    platforms: string[];
 }
 
 export class GeminiAIService {
