@@ -148,6 +148,10 @@ export interface MediaFile {
     }
     created_at: string
     updated_at: string
+    category?: string;
+    is_favorite: boolean;
+    usage_count: number;
+
 }
 
 export interface MediaMetadata {
@@ -156,6 +160,34 @@ export interface MediaMetadata {
     location?: string
     camera_info?: Record<string, any>
     processing_info?: Record<string, any>
+    width?: number;
+    height?: number;
+    duration?: number;
+    description?: string;
+    ai_analysis?: any;
+}
+
+export interface MediaCategory {
+    id: string;
+    name: string;
+    color: string;
+    count: number;
+}
+export interface UploadProgress {
+    id: string;
+    filename: string;
+    progress: number;
+    status: 'uploading' | 'processing' | 'analyzing' | 'completed' | 'error';
+    aiAnalysis?: any;
+}
+
+export interface AIAnalysisResult {
+    description: string;
+    suggestedCaption: string;
+    hashtags: string[];
+    colorPalette: string[];
+    mood: string;
+    marketingInsights: string[];
 }
 
 export interface Reminder {
