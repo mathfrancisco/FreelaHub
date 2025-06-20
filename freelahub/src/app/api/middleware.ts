@@ -23,46 +23,78 @@ export async function middleware(req: NextRequest) {
         }
     )
 
-    // Verifica a sessão do usuário
-    const {
-        data: { session },
-    } = await supabase.auth.getSession()
+    try {
+        // Verifica a sessão do usuário
+        const {
+            data: { session },
+            error
+        } = await supabase.auth.getSession()
 
-    // Rotas que requerem autenticação
-    const protectedRoutes = ['/dashboard', '/content', '/leads', '/settings']
-    const isProtectedRoute = protectedRoutes.some(route =>
-        req.nextUrl.pathname.startsWith(route)
-    )
-
-    // Rotas de autenticação (não devem ser acessadas se já autenticado)
-    const authRoutes = ['/login', '/register']
-    const isAuthRoute = authRoutes.some(route =>
-        req.nextUrl.pathname.startsWith(route)
-    )
-
-    // Se está tentando acessar uma rota protegida sem estar autenticado
-    if (isProtectedRoute && !session) {
-        const redirectUrl = new URL('/login', req.url)
-        // Adiciona a rota atual como parâmetro de redirecionamento
-        redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname)
-        return NextResponse.redirect(redirectUrl)
-    }
-
-    // Se está tentando acessar rotas de auth já estando autenticado
-    if (isAuthRoute && session) {
-        return NextResponse.redirect(new URL('/dashboard', req.url))
-    }
-
-    // Redireciona da raiz para o dashboard se autenticado, senão para login
-    if (req.nextUrl.pathname === '/') {
-        if (session) {
-            return NextResponse.redirect(new URL('/dashboard', req.url))
-        } else {
-            return NextResponse.redirect(new URL('/login', req.url))
+        if (error) {
+            console.error('Erro no middleware ao verificar sessão:', error)
         }
-    }
 
-    return res
+        // Rotas que requerem autenticação
+        const protectedRoutes = ['/dashboard', '/content', '/leads', '/settings']
+        const isProtectedRoute = protectedRoutes.some(route =>
+            req.nextUrl.pathname.startsWith(route)
+        )
+
+        // Rotas de autenticação (não devem ser acessadas se já autenticado)
+        const authRoutes = ['/login', '/register']
+        const isAuthRoute = authRoutes.some(route =>
+            req.nextUrl.pathname.startsWith(route)
+        )
+
+        // Se está tentando acessar uma rota protegida sem estar autenticado
+        if (isProtectedRoute && !session) {
+            const redirectUrl = new URL('/login', req.url)
+            // Adiciona a rota atual como parâmetro de redirecionamento
+            redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname)
+            return NextResponse.redirect(redirectUrl)
+        }
+
+        // Se está tentando acessar rotas de auth já estando autenticado
+        if (isAuthRoute && session) {
+            // Verifica se há um parâmetro de redirecionamento
+            const redirectTo = req.nextUrl.searchParams.get('redirectTo')
+            if (redirectTo && redirectTo.startsWith('/')) {
+                return NextResponse.redirect(new URL(redirectTo, req.url))
+            }
+            return NextResponse.redirect(new URL('/dashboard', req.url))
+        }
+
+        // Redireciona da raiz para o dashboard se autenticado, senão para login
+        if (req.nextUrl.pathname === '/') {
+            if (session) {
+                return NextResponse.redirect(new URL('/dashboard', req.url))
+            } else {
+                return NextResponse.redirect(new URL('/login', req.url))
+            }
+        }
+
+        // Adiciona headers para cache do browser
+        if (session) {
+            res.headers.set('x-middleware-cache', 'no-cache')
+        }
+
+        return res
+    } catch (error) {
+        console.error('Erro no middleware:', error)
+
+        // Em caso de erro, permite acesso a rotas públicas
+        const authRoutes = ['/login', '/register']
+        const isAuthRoute = authRoutes.some(route =>
+            req.nextUrl.pathname.startsWith(route)
+        )
+
+        if (isAuthRoute || req.nextUrl.pathname === '/') {
+            return res
+        }
+
+        // Redireciona para login em caso de erro em rotas protegidas
+        return NextResponse.redirect(new URL('/login', req.url))
+    }
 }
 
 // Configura em quais rotas o middleware deve ser executado

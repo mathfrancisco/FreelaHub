@@ -381,7 +381,6 @@ export default function ContentEditorPage() {
                                 onSave={handleSave}
                                 onPublish={handlePublish}
                                 onSchedule={handleSchedule}
-                                onAIAnalysis={handleAIAnalysis}
                                 isSaving={isSaving}
                                 isAnalyzing={isAnalyzing}
                                 className="bg-transparent"

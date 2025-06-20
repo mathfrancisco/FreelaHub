@@ -27,14 +27,14 @@ import {
     BarChart3
 } from "lucide-react"
 import {Textarea} from "@/components/forms/textarea";
-import {AIAnalysis,Content} from "@/lib/types";
+import {Content} from "@/lib/types";
+import {useContentAnalysis} from "@/lib/hooks/aiHook";
 
 interface ContentEditorProps {
     content?: Partial<Content>,
     onSave?: (content: Partial<Content>) => void,
     onPublish?: (content: Partial<Content>) => void,
     onSchedule?: (content: Partial<Content>, date: string) => void,
-    onAIAnalysis?: (content: string) => Promise<AIAnalysis>,
     className?: string,
     isSaving?: boolean,
     isAnalyzing?: boolean
@@ -62,10 +62,8 @@ export default function ContentEditor({
                                           onSave,
                                           onPublish,
                                           onSchedule,
-                                          onAIAnalysis,
                                           className,
-                                          isSaving,
-                                          isAnalyzing: isAnalyzingProp
+                                          isSaving
                                       }: ContentEditorProps) {
     const [formData, setFormData] = useState<Partial<Content>>({
         title: content?.title || '',
@@ -77,12 +75,13 @@ export default function ContentEditor({
         ...content
     })
 
-    const [isAnalyzingLocal, setIsAnalyzingLocal] = useState(false)
-    const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(content?.ai_analysis || null)
+    const [aiAnalysis, setAiAnalysis] = useState<any>(content?.ai_analysis || null)
     const [newHashtag, setNewHashtag] = useState('')
     const [scheduleDate, setScheduleDate] = useState('')
+    const [analysisError, setAnalysisError] = useState<string | null>(null)
 
-    const isAnalyzingState = isAnalyzingProp || isAnalyzingLocal
+    // Hook do FreelaBotService para análise de conteúdo
+    const {analyzeContent, isAnalyzing} = useContentAnalysis()
 
     const handleInputChange = (field: keyof Content, value: any) => {
         setFormData(prev => ({...prev, [field]: value}))
@@ -110,16 +109,47 @@ export default function ContentEditor({
     }
 
     const handleAIAnalysis = async () => {
-        if (!onAIAnalysis || !formData.body) return
+        if (!formData.body) {
+            setAnalysisError('Digite algum conteúdo para analisar')
+            return
+        }
 
-        setIsAnalyzingLocal(true)
+        setAnalysisError(null)
+
         try {
-            const analysis = await onAIAnalysis(formData.body)
-            setAiAnalysis(analysis)
+            // Usar contentId existente ou gerar um temporário
+            const contentId = content?.id || `temp-${Date.now()}`
+
+            const analysis = await analyzeContent(contentId, formData.body)
+
+            // Mapear os dados da análise para o formato esperado pela UI
+            const mappedAnalysis = {
+                sentiment: analysis.sentiment || 'neutral',
+                readability_score: analysis.readabilityScore || 0,
+                seo_score: analysis.seoScore || 0,
+                suggestions: analysis.suggestions || [],
+                hashtags: analysis.hashtags || [],
+                engagement_score: analysis.engagementScore || 0,
+                tone: analysis.tone || '',
+                key_topics: analysis.keyTopics || [],
+                optimizations: analysis.optimizations || []
+            }
+
+            setAiAnalysis(mappedAnalysis)
+
+            // Se há hashtags sugeridas, perguntar se quer adicioná-las
+            if (analysis.hashtags && analysis.hashtags.length > 0) {
+                const newHashtags = analysis.hashtags.filter(tag =>
+                    !formData.hashtags?.includes(tag)
+                )
+                if (newHashtags.length > 0) {
+                    handleInputChange('hashtags', [...(formData.hashtags || []), ...newHashtags])
+                }
+            }
+
         } catch (error) {
             console.error('Erro na análise de IA:', error)
-        } finally {
-            setIsAnalyzingLocal(false)
+            setAnalysisError('Erro ao analisar conteúdo. Tente novamente.')
         }
     }
 
@@ -145,29 +175,6 @@ export default function ContentEditor({
     const characterLimit = getCharacterLimit()
     const characterCount = getCharacterCount()
     const isOverLimit = characterLimit && characterCount > characterLimit
-
-    const mockAIAnalysis = () => {
-        setIsAnalyzingLocal(true)
-        setTimeout(() => {
-            setAiAnalysis({
-                content_insights: {call_to_action_strength: 0, complexity: "", emotional_appeal: 0, tone: ""},
-                engagement_score: 0,
-                optimal_posting_times: {},
-                predicted_performance: {facebook: 0, instagram: 0, linkedin: 0, twitter: 0},
-                tone: [],
-                topics: [],
-                sentiment: 'positive',
-                readability_score: 85,
-                seo_score: 78,
-                suggestions: [
-                    'Adicione mais hashtags relevantes',
-                    'Considere incluir uma call-to-action',
-                    'O tom está adequado para o público-alvo'
-                ]
-            })
-            setIsAnalyzingLocal(false)
-        }, 2000)
-    }
 
     return (
         <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 ${className}`}>
@@ -210,10 +217,12 @@ export default function ContentEditor({
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Editor Principal */}
                     <div className="lg:col-span-2 space-y-6">
-                        <Card className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <Card
+                            className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                             <CardHeader className="pb-4">
                                 <CardTitle className="text-xl font-semibold text-slate-800 flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
+                                    <div
+                                        className="w-2 h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
                                     Conteúdo Principal
                                 </CardTitle>
                             </CardHeader>
@@ -251,12 +260,12 @@ export default function ContentEditor({
                                 <div className="flex space-x-3">
                                     <Button
                                         variant="outline"
-                                        onClick={mockAIAnalysis}
-                                        disabled={isAnalyzingState || !formData.body}
+                                        onClick={handleAIAnalysis}
+                                        disabled={isAnalyzing || !formData.body}
                                         className="border-purple-200 text-purple-600 hover:bg-purple-50 transition-all duration-200"
                                     >
-                                        <Wand2 className={`h-4 w-4 mr-2 ${isAnalyzingState ? 'animate-spin' : ''}`}/>
-                                        {isAnalyzingState ? 'Analisando...' : 'Análise IA'}
+                                        <Wand2 className={`h-4 w-4 mr-2 ${isAnalyzing ? 'animate-spin' : ''}`}/>
+                                        {isAnalyzing ? 'Analisando...' : 'Análise IA'}
                                     </Button>
                                     <Button
                                         variant="outline"
@@ -266,11 +275,19 @@ export default function ContentEditor({
                                         Adicionar Mídia
                                     </Button>
                                 </div>
+
+                                {analysisError && (
+                                    <div
+                                        className="text-red-500 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+                                        {analysisError}
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 
                         {/* Hashtags */}
-                        <Card className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <Card
+                            className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                             <CardHeader className="pb-4">
                                 <CardTitle className="text-xl font-semibold text-slate-800 flex items-center gap-2">
                                     <Hash className="h-5 w-5 text-blue-500"/>
@@ -313,10 +330,12 @@ export default function ContentEditor({
                     {/* Sidebar */}
                     <div className="space-y-6">
                         {/* Configurações */}
-                        <Card className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <Card
+                            className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                             <CardHeader className="pb-4">
                                 <CardTitle className="text-xl font-semibold text-slate-800 flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></div>
+                                    <div
+                                        className="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></div>
                                     Configurações
                                 </CardTitle>
                             </CardHeader>
@@ -327,7 +346,8 @@ export default function ContentEditor({
                                         value={formData.content_type}
                                         onValueChange={(value) => handleInputChange('content_type', value)}
                                     >
-                                        <SelectTrigger className="mt-2 border-slate-200 focus:border-green-400 focus:ring-green-400/20">
+                                        <SelectTrigger
+                                            className="mt-2 border-slate-200 focus:border-green-400 focus:ring-green-400/20">
                                             <SelectValue/>
                                         </SelectTrigger>
                                         <SelectContent>
@@ -349,7 +369,8 @@ export default function ContentEditor({
                                         value={formData.status}
                                         onValueChange={(value) => handleInputChange('status', value)}
                                     >
-                                        <SelectTrigger className="mt-2 border-slate-200 focus:border-green-400 focus:ring-green-400/20">
+                                        <SelectTrigger
+                                            className="mt-2 border-slate-200 focus:border-green-400 focus:ring-green-400/20">
                                             <SelectValue/>
                                         </SelectTrigger>
                                         <SelectContent>
@@ -364,7 +385,8 @@ export default function ContentEditor({
                         </Card>
 
                         {/* Plataformas */}
-                        <Card className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <Card
+                            className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                             <CardHeader className="pb-4">
                                 <CardTitle className="text-xl font-semibold text-slate-800 flex items-center gap-2">
                                     <Target className="h-5 w-5 text-purple-500"/>
@@ -388,7 +410,8 @@ export default function ContentEditor({
                                                 <span className="font-medium">{platform.name}</span>
                                             </div>
                                             {formData.target_platforms?.includes(platform.id) && (
-                                                <div className="w-3 h-3 bg-white/80 rounded-full flex items-center justify-center">
+                                                <div
+                                                    className="w-3 h-3 bg-white/80 rounded-full flex items-center justify-center">
                                                     <div className="w-1.5 h-1.5 bg-current rounded-full"/>
                                                 </div>
                                             )}
@@ -399,7 +422,8 @@ export default function ContentEditor({
                         </Card>
 
                         {/* Agendamento */}
-                        <Card className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <Card
+                            className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                             <CardHeader className="pb-4">
                                 <CardTitle className="text-xl font-semibold text-slate-800 flex items-center gap-2">
                                     <Calendar className="h-5 w-5 text-orange-500"/>
@@ -408,7 +432,8 @@ export default function ContentEditor({
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
-                                    <Label htmlFor="schedule-date" className="text-slate-700 font-medium">Data e Hora</Label>
+                                    <Label htmlFor="schedule-date" className="text-slate-700 font-medium">Data e
+                                        Hora</Label>
                                     <Input
                                         id="schedule-date"
                                         type="datetime-local"
@@ -431,7 +456,8 @@ export default function ContentEditor({
 
                         {/* Análise IA */}
                         {aiAnalysis && (
-                            <Card className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                            <Card
+                                className="border-slate-200 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-xl font-semibold text-slate-800 flex items-center gap-2">
                                         <Sparkles className="h-5 w-5 text-purple-500"/>
@@ -440,15 +466,28 @@ export default function ContentEditor({
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="text-center p-3 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg">
-                                            <div className="text-2xl font-bold text-purple-600">{aiAnalysis.readability_score}</div>
+                                        <div
+                                            className="text-center p-3 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg">
+                                            <div
+                                                className="text-2xl font-bold text-purple-600">{aiAnalysis.readability_score || 0}</div>
                                             <div className="text-sm text-slate-600">Legibilidade</div>
                                         </div>
-                                        <div className="text-center p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
-                                            <div className="text-2xl font-bold text-green-600">{aiAnalysis.seo_score}</div>
+                                        <div
+                                            className="text-center p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
+                                            <div
+                                                className="text-2xl font-bold text-green-600">{aiAnalysis.seo_score || 0}</div>
                                             <div className="text-sm text-slate-600">SEO Score</div>
                                         </div>
                                     </div>
+
+                                    {aiAnalysis.engagement_score && (
+                                        <div
+                                            className="text-center p-3 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-lg">
+                                            <div
+                                                className="text-2xl font-bold text-orange-600">{aiAnalysis.engagement_score}</div>
+                                            <div className="text-sm text-slate-600">Engajamento Previsto</div>
+                                        </div>
+                                    )}
 
                                     <div>
                                         <Label className="text-sm font-medium text-slate-700">Sentimento</Label>
@@ -464,17 +503,45 @@ export default function ContentEditor({
                                         </Badge>
                                     </div>
 
+                                    {aiAnalysis.tone && (
+                                        <div>
+                                            <Label className="text-sm font-medium text-slate-700">Tom</Label>
+                                            <div className="text-sm text-slate-600 bg-slate-50 rounded-lg p-2 mt-1">
+                                                {aiAnalysis.tone}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {aiAnalysis.suggestions && aiAnalysis.suggestions.length > 0 && (
                                         <div>
-                                            <Label className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                                            <Label
+                                                className="text-sm font-medium text-slate-700 flex items-center gap-1">
                                                 <BarChart3 className="h-4 w-4"/>
                                                 Sugestões
                                             </Label>
                                             <ul className="text-sm space-y-2 mt-2">
                                                 {aiAnalysis.suggestions.slice(0, 3).map((suggestion, index) => (
-                                                    <li key={index} className="text-slate-600 bg-slate-50 rounded-lg p-2 flex items-start gap-2">
-                                                        <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2 flex-shrink-0"/>
+                                                    <li key={index}
+                                                        className="text-slate-600 bg-slate-50 rounded-lg p-2 flex items-start gap-2">
+                                                        <div
+                                                            className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2 flex-shrink-0"/>
                                                         {suggestion}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {aiAnalysis.optimizations && aiAnalysis.optimizations.length > 0 && (
+                                        <div>
+                                            <Label className="text-sm font-medium text-slate-700">Otimizações</Label>
+                                            <ul className="text-sm space-y-1 mt-2">
+                                                {aiAnalysis.optimizations.slice(0, 3).map((optimization, index) => (
+                                                    <li key={index}
+                                                        className="text-slate-600 bg-blue-50 rounded-lg p-2 flex items-start gap-2">
+                                                        <div
+                                                            className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0"/>
+                                                        {optimization}
                                                     </li>
                                                 ))}
                                             </ul>

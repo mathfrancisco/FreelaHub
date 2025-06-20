@@ -19,8 +19,9 @@ export const useAuthStore = create<AuthState>()(
     persist(
         (set, get) => ({
             user: null,
-            isLoading: false,
+            isLoading: true, // Inicia como true para evitar flash
             isAuthenticated: false,
+            _hasHydrated: false, // Adiciona flag de hidratação
 
             signIn: async (email: string, password: string) => {
                 set({ isLoading: true })
@@ -33,7 +34,6 @@ export const useAuthStore = create<AuthState>()(
                     if (error) throw error
 
                     if (data.user) {
-                        // Use type assertion or proper typing for the query
                         const { data: profile, error: profileError } = await supabase
                             .from('profiles')
                             .select('*')
@@ -59,10 +59,10 @@ export const useAuthStore = create<AuthState>()(
                     throw error
                 }
             },
+
             signUp: async (email: string, password: string, fullName: string) => {
                 set({ isLoading: true })
                 try {
-                    // Primeiro, criar o usuário no Supabase Auth
                     const { data, error } = await supabase.auth.signUp({
                         email,
                         password,
@@ -78,7 +78,6 @@ export const useAuthStore = create<AuthState>()(
                         throw new Error(`Erro ao criar conta: ${error.message}`)
                     }
 
-                    // Se o usuário foi criado mas precisa confirmar email
                     if (data.user && !data.user.email_confirmed_at) {
                         console.log('Usuário criado, aguardando confirmação de email')
                     }
@@ -106,7 +105,6 @@ export const useAuthStore = create<AuthState>()(
                 const { user } = get()
                 if (!user) return
 
-                // Map updates to Supabase format
                 const profileUpdate: ProfileUpdate = {}
 
                 if (updates.full_name !== undefined) {
@@ -125,7 +123,6 @@ export const useAuthStore = create<AuthState>()(
                     profileUpdate.settings = updates.settings
                 }
 
-                // Always update timestamp
                 profileUpdate.updated_at = new Date().toISOString()
 
                 const { data, error } = await supabase
@@ -144,7 +141,13 @@ export const useAuthStore = create<AuthState>()(
             },
 
             checkAuth: async () => {
-                set({ isLoading: true })
+                const state = get()
+
+                // Se já temos um usuário persistido e não verificamos ainda, usa ele primeiro
+                if (state.user && state.isAuthenticated && !state._hasHydrated) {
+                    set({ _hasHydrated: true, isLoading: false })
+                }
+
                 try {
                     const { data: { session } } = await supabase.auth.getSession()
 
@@ -160,7 +163,8 @@ export const useAuthStore = create<AuthState>()(
                             set({
                                 user: null,
                                 isAuthenticated: false,
-                                isLoading: false
+                                isLoading: false,
+                                _hasHydrated: true
                             })
                             return
                         }
@@ -170,14 +174,16 @@ export const useAuthStore = create<AuthState>()(
                             set({
                                 user,
                                 isAuthenticated: true,
-                                isLoading: false
+                                isLoading: false,
+                                _hasHydrated: true
                             })
                         }
                     } else {
                         set({
                             user: null,
                             isAuthenticated: false,
-                            isLoading: false
+                            isLoading: false,
+                            _hasHydrated: true
                         })
                     }
                 } catch (error) {
@@ -185,10 +191,16 @@ export const useAuthStore = create<AuthState>()(
                     set({
                         user: null,
                         isAuthenticated: false,
-                        isLoading: false
+                        isLoading: false,
+                        _hasHydrated: true
                     })
                 }
             },
+
+            // Método para marcar como hidratado
+            setHasHydrated: () => {
+                set({ _hasHydrated: true })
+            }
         }),
         {
             name: 'auth-storage',
@@ -196,6 +208,13 @@ export const useAuthStore = create<AuthState>()(
                 user: state.user,
                 isAuthenticated: state.isAuthenticated
             }),
+            onRehydrateStorage: () => (state) => {
+                // Quando a hidratação terminar, marca como hidratado e remove loading
+                if (state) {
+                    state._hasHydrated = true
+                    state.isLoading = false
+                }
+            }
         }
     )
 )

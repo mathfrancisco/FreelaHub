@@ -1,7 +1,7 @@
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import {useState} from "react"
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {Button} from "@/components/ui/button"
+import {Badge} from "@/components/ui/badge"
 import {
     ChevronLeft,
     ChevronRight,
@@ -12,18 +12,19 @@ import {
     Edit,
     Trash2
 } from "lucide-react"
-import { Content } from "@/lib/types"
-import { cn } from "@/lib/utils/utils"
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isSameMonth } from "date-fns"
-import { ptBR } from "date-fns/locale"
+import {Content} from "@/lib/types"
+import {cn} from "@/lib/utils/utils"
+import {format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isSameMonth} from "date-fns"
+import {ptBR} from "date-fns/locale"
 
 interface ContentCalendarProps {
-    contents: Content[]
-    onContentClick?: (content: Content) => void
-    onContentEdit?: (content: Content) => void
-    onContentDelete?: (contentId: string) => void
-    onAddContent?: (date: Date) => void
-    className?: string
+    contents: Content[],
+    onContentClick?: (content: Content) => void,
+    onContentEdit?: (content: Content) => void,
+    onContentDelete?: (contentId: string) => void,
+    onAddContent?: (date: Date) => void,
+    className?: string,
+    isLoading?: any
 }
 
 const statusColors = {
@@ -54,14 +55,15 @@ export function ContentCalendar({
                                     onContentEdit,
                                     onContentDelete,
                                     onAddContent,
-                                    className
+                                    className,
+                                    isLoading
                                 }: ContentCalendarProps) {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
     const monthStart = startOfMonth(currentDate)
     const monthEnd = endOfMonth(currentDate)
-    const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
+    const calendarDays = eachDayOfInterval({start: monthStart, end: monthEnd})
 
     const goToPreviousMonth = () => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))
@@ -94,18 +96,18 @@ export function ContentCalendar({
                     <h2 className="text-2xl font-bold">Calendário de Conteúdo</h2>
                     <div className="flex items-center space-x-2">
                         <Button variant="outline" size="icon" onClick={goToPreviousMonth}>
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft className="h-4 w-4"/>
                         </Button>
                         <div className="text-lg font-semibold min-w-[150px] text-center">
-                            {format(currentDate, 'MMMM yyyy', { locale: ptBR })}
+                            {format(currentDate, 'MMMM yyyy', {locale: ptBR})}
                         </div>
                         <Button variant="outline" size="icon" onClick={goToNextMonth}>
-                            <ChevronRight className="h-4 w-4" />
+                            <ChevronRight className="h-4 w-4"/>
                         </Button>
                     </div>
                 </div>
                 <Button onClick={() => onAddContent?.(new Date())}>
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 mr-2"/>
                     Novo Conteúdo
                 </Button>
             </div>
@@ -118,7 +120,8 @@ export function ContentCalendar({
                             {/* Cabeçalho dos dias da semana */}
                             <div className="grid grid-cols-7 gap-1 mb-4">
                                 {weekDays.map((day) => (
-                                    <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
+                                    <div key={day}
+                                         className="p-2 text-center text-sm font-medium text-muted-foreground">
                                         {day}
                                     </div>
                                 ))}
@@ -187,8 +190,8 @@ export function ContentCalendar({
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-2" />
-                                {selectedDate ? format(selectedDate, "d 'de' MMMM", { locale: ptBR }) : 'Selecione um dia'}
+                                <Calendar className="h-4 w-4 mr-2"/>
+                                {selectedDate ? format(selectedDate, "d 'de' MMMM", {locale: ptBR}) : 'Selecione um dia'}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -199,7 +202,7 @@ export function ContentCalendar({
                                         className="w-full"
                                         onClick={() => onAddContent?.(selectedDate)}
                                     >
-                                        <Plus className="h-4 w-4 mr-2" />
+                                        <Plus className="h-4 w-4 mr-2"/>
                                         Adicionar Conteúdo
                                     </Button>
 
@@ -223,7 +226,7 @@ export function ContentCalendar({
                                                                 className="h-6 w-6"
                                                                 onClick={() => onContentClick?.(content)}
                                                             >
-                                                                <Eye className="h-3 w-3" />
+                                                                <Eye className="h-3 w-3"/>
                                                             </Button>
                                                             <Button
                                                                 variant="ghost"
@@ -231,7 +234,7 @@ export function ContentCalendar({
                                                                 className="h-6 w-6"
                                                                 onClick={() => onContentEdit?.(content)}
                                                             >
-                                                                <Edit className="h-3 w-3" />
+                                                                <Edit className="h-3 w-3"/>
                                                             </Button>
                                                             <Button
                                                                 variant="ghost"
@@ -239,7 +242,7 @@ export function ContentCalendar({
                                                                 className="h-6 w-6 text-destructive"
                                                                 onClick={() => onContentDelete?.(content.id)}
                                                             >
-                                                                <Trash2 className="h-3 w-3" />
+                                                                <Trash2 className="h-3 w-3"/>
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -253,8 +256,9 @@ export function ContentCalendar({
                                                         </Badge>
 
                                                         {content.scheduled_for && (
-                                                            <div className="flex items-center text-xs text-muted-foreground">
-                                                                <Clock className="h-3 w-3 mr-1" />
+                                                            <div
+                                                                className="flex items-center text-xs text-muted-foreground">
+                                                                <Clock className="h-3 w-3 mr-1"/>
                                                                 {format(new Date(content.scheduled_for), 'HH:mm')}
                                                             </div>
                                                         )}
@@ -262,7 +266,8 @@ export function ContentCalendar({
                                                         {content.target_platforms && content.target_platforms.length > 0 && (
                                                             <div className="flex flex-wrap gap-1">
                                                                 {content.target_platforms.slice(0, 3).map((platform) => (
-                                                                    <Badge key={platform} variant="secondary" className="text-xs">
+                                                                    <Badge key={platform} variant="secondary"
+                                                                           className="text-xs">
                                                                         {platform}
                                                                     </Badge>
                                                                 ))}

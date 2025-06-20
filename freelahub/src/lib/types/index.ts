@@ -220,6 +220,7 @@ export interface AuthState {
     user: User | null
     isLoading: boolean
     isAuthenticated: boolean
+    _hasHydrated: boolean // Add this line
     signIn: (email: string, password: string) => Promise<void>
     signUp: (email: string, password: string, fullName: string) => Promise<{
         user: User | null;
@@ -231,6 +232,7 @@ export interface AuthState {
     signOut: () => Promise<void>
     updateUser: (updates: Partial<User>) => Promise<void>
     checkAuth: () => Promise<void>
+    setHasHydrated: () => void
 }
 
 // Type for safe Supabase updates

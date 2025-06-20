@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState} from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react'
 import { useAuthStore } from '@/store/auth-store'
 import LandingHeader from "@/components/layout/home/landingHeader"
 import Footer from "@/components/layout/home/footer"
+import {useAuthPage} from "@/lib/hooks/useAuth";
 
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
@@ -19,6 +20,20 @@ export default function LoginPage() {
 
     const { signIn } = useAuthStore()
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const { isLoading: authLoading } = useAuthPage()
+
+    // Se ainda está carregando a autenticação, mostra loading
+    if (authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Carregando...</p>
+                </div>
+            </div>
+        )
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -27,7 +42,14 @@ export default function LoginPage() {
 
         try {
             await signIn(formData.email, formData.password)
-            router.push('/dashboard')
+
+            // Verifica se há um parâmetro de redirecionamento
+            const redirectTo = searchParams.get('redirectTo')
+            if (redirectTo && redirectTo.startsWith('/')) {
+                router.push(redirectTo)
+            } else {
+                router.push('/dashboard')
+            }
         } catch (error: any) {
             setError(error.message || 'Ocorreu um erro. Tente novamente.')
         } finally {
